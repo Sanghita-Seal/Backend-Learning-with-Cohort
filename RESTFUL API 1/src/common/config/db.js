@@ -4,9 +4,9 @@ const connectDB= async()=>{
     //DB connection may fail
     //DB is in another continent
 
-    await mongoose.connect(process.env.MONGODB_URI);
+    const conn = await mongoose.connect(process.env.MONGODB_URI);
 
-    console.log(`MongoDB connected: ${connectDB.connection.host}`);
+    console.log(`MongoDB connected: ${conn.connection.host}`);
 
     
 }

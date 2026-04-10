@@ -89,4 +89,29 @@ const refresh = async (token) => {
   retrun({ accessToken });
 };
 
-export { register };
+//to log out I can only delete the refresh token form the DB, still user can access untill the access Token is expired
+const logout = async (userId) =>{
+    // const user = await User.findById(userId);
+    // if(!user) throw ApiError.unauthorised("User not found");
+
+    // user.refreshToken = undefined;
+    // await user.save({validateBeforeSave: false})
+
+    await User.findByIdAndUpdate(userId, {refreshToken: null})
+}
+
+
+const forgotPassword = async(email) =>{
+    const user = await User.findOne({email})
+    if(!user) throw ApiError.notfound("No account with that email");
+
+    const {rawToken, hashedToken} = generateResetToken
+    user.resetPasswordToken = hashedToken
+    user.resetPasswordExpires = Date.now() + 15*60*1000
+
+    await user.save()
+
+    //TODO : mail bhejna nhi aata
+}
+
+export { register, login, refresh, logout,  forgotPassword };

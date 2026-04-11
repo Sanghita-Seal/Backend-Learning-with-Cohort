@@ -10,6 +10,7 @@ const router= Router();
 router.post("/register", validate(RegisterDto), controller.register );
 
 router.post("/login", validate(loginDto), controller.login);
+router.post("/logout", authenticate, controller.logout);
 router.get("/me", authenticate, controller.getMe);
 
 

@@ -114,7 +114,11 @@ const forgotPassword = async (email) => {
 
   //TODO : mail bhejna nhi aata
 };
-
+const getMe = async(userId)=>{
+    const user = await User.findById(userId)
+    if(!user) throw ApiError.notfound("User not found");
+    return user;
+}
 const resetPassword = async (email) => {
   //- take token from user
   // - verify from DB
@@ -124,4 +128,4 @@ const resetPassword = async (email) => {
   
 };
 
-export { register, login, refresh, logout, forgotPassword };
+export { register, login, refresh, logout, forgotPassword , getMe};

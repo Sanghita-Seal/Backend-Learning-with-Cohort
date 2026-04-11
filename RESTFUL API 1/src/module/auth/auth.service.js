@@ -44,6 +44,8 @@ const login = async ({ email, password }) => {
   if (!user) throw ApiError.unauthorised("Invalid email or password");
 
   //somehow I will check password
+  const isMatch = await user.comparePassword(password);
+  if(!isMatch) throw ApiError.unauthorised("Invalid email or password")
 
   if (!user.isVerified) {
     throw ApiError.forbidden("Please verify your email before login");
@@ -90,28 +92,36 @@ const refresh = async (token) => {
 };
 
 //to log out I can only delete the refresh token form the DB, still user can access untill the access Token is expired
-const logout = async (userId) =>{
-    // const user = await User.findById(userId);
-    // if(!user) throw ApiError.unauthorised("User not found");
+const logout = async (userId) => {
+  // const user = await User.findById(userId);
+  // if(!user) throw ApiError.unauthorised("User not found");
 
-    // user.refreshToken = undefined;
-    // await user.save({validateBeforeSave: false})
+  // user.refreshToken = undefined;
+  // await user.save({validateBeforeSave: false})
 
-    await User.findByIdAndUpdate(userId, {refreshToken: null})
-}
+  await User.findByIdAndUpdate(userId, { refreshToken: null });
+};
 
+const forgotPassword = async (email) => {
+  const user = await User.findOne({ email });
+  if (!user) throw ApiError.notfound("No account with that email");
 
-const forgotPassword = async(email) =>{
-    const user = await User.findOne({email})
-    if(!user) throw ApiError.notfound("No account with that email");
+  const { rawToken, hashedToken } = generateResetToken;
+  user.resetPasswordToken = hashedToken;
+  user.resetPasswordExpires = Date.now() + 15 * 60 * 1000;
 
-    const {rawToken, hashedToken} = generateResetToken
-    user.resetPasswordToken = hashedToken
-    user.resetPasswordExpires = Date.now() + 15*60*1000
+  await user.save();
 
-    await user.save()
+  //TODO : mail bhejna nhi aata
+};
 
-    //TODO : mail bhejna nhi aata
-}
+const resetPassword = async (email) => {
+  //- take token from user
+  // - verify from DB
+  // - take new password from user
+  // - update password in the Db
 
-export { register, login, refresh, logout,  forgotPassword };
+  
+};
+
+export { register, login, refresh, logout, forgotPassword };

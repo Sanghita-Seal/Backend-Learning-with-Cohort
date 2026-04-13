@@ -30,10 +30,14 @@ const logout = async (req, res)=>{
     res.clearCookie("refreshToken")
     ApiResponse.ok(res, "Logout Success");
 }
+const verifyEmail = async (req, res) => {
+  await authService.verifyEmail(req.params.token);
+  ApiResponse.ok(res, "Email verified successfully");
+};
 
 const getMe = async ( req, res) =>{
     const user = await authService.getMe(req.user.id);
     ApiResponse.ok(res, "User Profile", user);
 }
 
-export { register , login, logout, getMe  };
+export { register , login, logout, getMe, verifyEmail };

@@ -1,3 +1,4 @@
+import { sendVerificationEmail } from "../../common/config/email.js";
 import ApiError from "../../common/utils/api-error.js";
 import {
   generateAccessToken,
@@ -26,6 +27,12 @@ const register = async ({ name, email, password, role }) => {
   });
 
   // TODO: send an email to user with token: rawToken
+  try {
+    await sendVerificationEmail(email, token)
+  } catch (error) {
+    console.log(error);
+    
+  }
 
   const userObj = user.toObject();
   delete userObj.password;
@@ -114,6 +121,21 @@ const forgotPassword = async (email) => {
 
   //TODO : mail bhejna nhi aata
 };
+
+const verifyEmail = async(token)=>{
+  //the verification token is hashed
+  const hashedToken = hashToken(token);
+  const user = await User.findOne({verificationToken: hashedToken}).select("+verificationToken")
+
+  //if user not found
+  if(!user) throw ApiError.notfound("User not found");
+
+  user.isVerified = true;
+  user.verificationToken = undefined
+  await user.save()
+  return user;
+
+}
 const getMe = async(userId)=>{
     const user = await User.findById(userId)
     if(!user) throw ApiError.notfound("User not found");
@@ -128,4 +150,4 @@ const resetPassword = async (email) => {
   
 };
 
-export { register, login, refresh, logout, forgotPassword , getMe};
+export { register, login, refresh, logout, forgotPassword , getMe, verifyEmail , resetPassword };
